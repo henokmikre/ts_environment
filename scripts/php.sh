@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if brew list php; then
+if brew list php@7.3; then
   echo $'\n'
   echo "Configuring PHP"
   echo $'\n'
@@ -9,38 +9,26 @@ if brew list php; then
   echo "Installing PECL extensions (xdebug) for each version of PHP"
   echo $'\n'
 
-  brew unlink php
-
-  for VER in 7.2 7.3 7.4
-  do
-    brew link --force php@$VER
-    php -v
-    pecl install -f xdebug
-    brew unlink php@$VER
-  done
+  brew link --force php@7.3
+  php -v
+  pecl install -f xdebug
 
   echo $'\n'
   echo "Installing TS config for each version of PHP"
   echo $'\n'
 
-  for VER in 7.2 7.3 7.4
+  for VER in 7.3
   do
     $(brew --prefix gettext)/bin/envsubst < config/php-ts.ini > $(brew --prefix)/etc/php/$VER/conf.d/php-ts.ini
   done
 
-  # Install cgr scripts under oldest php version for backwards compat
-  brew link --force php@7.2
-
   source scripts/cgr.sh
-
-  brew unlink php@7.2
 
   echo $'\n'
   echo "Starting PHP."
   echo $'\n'
 
-  brew link php
-  brew services start php
+  brew services start php@7.3
 
   mkdir -pv ~/.drush
   cp -n config/drushrc.php ~/.drush/drushrc.php
